@@ -1,12 +1,12 @@
 [package]
 name = "stop-token"
 version = "0.1.2"
-authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>"]
+authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>", "Artem Vorotnikov <artem@vorotnikov.me>", "mexus <gilaldpellaeon@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/async-rs/stop-token"
+repository = "https://github.com/vorot93/tokio-stop-token"
 
-description = "Experimental cooperative cancellation for async-std"
+description = "Experimental cooperative cancellation for tokio"
 
 [dependencies]
 futures-intrusive = "0.2"
