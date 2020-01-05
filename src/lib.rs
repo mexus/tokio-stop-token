@@ -1,18 +1,9 @@
-//! Cooperative cancellation for [async-std](https://async.rs/).
+//! Cooperative cancellation for [Tokio](https://tokio.rs/).
 //!
 //! # Status
 //!
 //! Experimental. The library works as is, breaking changes will bump major
 //! version, but there are no guarantees of long-term support.
-//!
-//! Additionally, this library uses unstable cargo feature feature of `async-std` and, for
-//! this reason, should be used like this:
-//!
-//! ```toml
-//! [dependencies.stop-token]
-//! version = "0.1.0"
-//! features = [ "unstable" ]
-//! ```
 //!
 //! # Motivation
 //!
@@ -46,7 +37,7 @@
 //! You can use `stop_token` for this:
 //!
 //! ```
-//! use async_std::prelude::*;
+//! use tokio::stream::*;
 //! use stop_token::StopToken;
 //!
 //! struct Event;
@@ -67,12 +58,14 @@
 //! The cancellation system is a subset of `C#` [`CancellationToken / CancellationTokenSource`](https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads).
 //! The `StopToken / StopTokenSource` terminology is borrowed from C++ paper P0660: https://wg21.link/p0660.
 
+use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use async_std::prelude::*;
-use async_std::sync::{channel, Receiver, Sender};
+use futures_intrusive::channel::shared::*;
 use pin_project_lite::pin_project;
+use pin_utils::pin_mut;
+use tokio::stream::*;
 
 enum Never {}
 
@@ -127,9 +120,10 @@ impl StopSource {
 impl Future for StopToken {
     type Output = ();
 
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
-        let chan = Pin::new(&mut self.chan);
-        match Stream::poll_next(chan, cx) {
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
+        let fut = self.chan.receive();
+        pin_mut!(fut);
+        match Future::poll(fut, cx) {
             Poll::Pending => Poll::Pending,
             Poll::Ready(Some(never)) => match never {},
             Poll::Ready(None) => Poll::Ready(()),

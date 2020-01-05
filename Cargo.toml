@@ -9,8 +9,10 @@ repository = "https://github.com/async-rs/stop-token"
 description = "Experimental cooperative cancellation for async-std"
 
 [dependencies]
+futures-intrusive = "0.2"
 pin-project-lite = "0.1.0"
-async-std = "1.0"
+pin-utils = "0.1.0-alpha"
+tokio = { version = "0.2", features = ["stream"] }
 
-[features]
-unstable = ["async-std/unstable"]
+[dev-dependencies]
+async-std = { version = "1", features = ["unstable"] }
