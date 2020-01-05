@@ -15,4 +15,5 @@ pin-utils = "0.1.0-alpha"
 tokio = { version = "0.2", features = ["stream"] }
 
 [dev-dependencies]
-async-std = { version = "1", features = ["unstable"] }
+tokio = { version = "0.2", features = ["full"] }
+async-stream = "0.2.0"
